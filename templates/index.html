@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="pragma" content="no-cache">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script>var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};</script>
+    <link rel="stylesheet" type="text/css" href="/static/style.css" />
+
+    <title>Wild life</title>
+
+</head>
+<body>
+<div id="call2action">Lancez une recherche sur les bases Wikidata & SPECIES+ des espèces menacées</div>
+<form action="search" method= "post" width="90%" id="searchform">
+    <input pattern=".{4,}" required title="Minimum de 4 caractères" type="search" placeholder="Mots-clés..." name="search" id="search" required/>
+    <button type="submit" class="searchbutton" onclick="
+    var val = document.getElementById('search').value;
+
+    if (val.length >= 4) {
+        $('#loading').show();
+        document.getElementById('table').innerText = '';
+        document.getElementById('commentaire').innerText = '';
+    }">Rechercher</button>
+</form>
+
+<div id="content">
+    <div id="loading" style="display:none;" align="center">
+        <img src="/static/images/wait.gif" />
+    </div>
+    <div id="commentaire" align="center">
+        {% if items is defined %}
+            {% if items|length == 0 %}
+                <p style="color:darkgray;">Aucun résultat trouvé sur Wikidata parmi les espèces SPECIES+.</p>
+            {% else %}
+                <p style="color:darkgray;">{{ items|length }} résultats issus de Wikidata.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div style="margin:5px auto; width:50%;" id="res">
+        <table>
+            {% for item in items %}
+                <tr style="border: dashed black; border-width: 1px; ">
+                    <td width="40%" valign="top">
+                        {% if item.image is defined %}
+                            <img src="{{ item.image.value }}" width="75%" />
+                        {% endif %}
+                    </td>
+                    <td align="left" width="50%" valign="top">
+                        <h1><a href="{{ item.item.value }}">{{ item.itemLabel.value }}</a></h1>
+                        <ul>
+                            <li>{% if item.nomscientifique is defined %}
+                                Nom scientifique : <i>{{ item.nomscientifique.value }}</i></li>
+                            {% endif %}
+                            <li>{% if item.rangtaxinomique is defined %}
+                                Rang taxinomique : <a href="{{ item.rangtaxinomique.value }}">{{ item.rangtaxinomiqueLabel.value }}</a>
+                            {% endif %}</li>
+                            <li>{% if item.taxonsuperieur is defined %}
+                                Taxon supérieur : <a href="{{ item.taxonsuperieur.value }}">{{ item.taxonsuperieurLabel.value }}</a>
+                            {% endif %}</li>
+                            <li>{% if item.identifiantSPECIES is defined %}
+                                Id SPECIES+ : {{ item.identifiantSPECIES.value }}
+                            {% endif %}</li>
+                        </ul>
+                    </td>
+                    <td width="20%" valign="middle">
+                        <a href="/details/{{item.identifiantSPECIES.value}}">En savoir +</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+</body>
+
+</html>
