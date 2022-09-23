@@ -13,7 +13,7 @@ mysql-connector-python==8.0.17
 mysqlclient==1.4.4
 numpy==1.15.4
 oauthlib==3.1.0
-protobuf==3.9.1
+protobuf==3.18.3
 pyparsing==2.4.5
 PySocks==1.7.0
 pywikibot==3.0.20180823
